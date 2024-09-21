@@ -1,0 +1,106 @@
+CREATE TABLE "professions" (
+  "profession_id" integer PRIMARY KEY,
+  "name" text
+);
+
+CREATE TABLE "phone_numbers" (
+  "person_id" integer,
+  "number" integer UNIQUE
+);
+
+CREATE TABLE "workers" (
+  "person_id" integer,
+  "profession_id" integer,
+  "work_experience" integer,
+  "salary" integer,
+  PRIMARY KEY ("person_id", "profession_id")
+);
+
+CREATE TABLE "persons" (
+  "person_id" integer PRIMARY KEY,
+  "name" text,
+  "date_of_birth" date
+);
+
+CREATE TABLE "buildings" (
+  "building_id" integer PRIMARY KEY,
+  "address" text UNIQUE,
+  "building_type" text,
+  "postcode" integer,
+  "date_of_built" date
+);
+
+CREATE TABLE "building_types" (
+  "id" integer,
+  "type_name" text UNIQUE
+);
+
+CREATE TABLE "rooms" (
+  "room_id" integer,
+  "building_id" integer,
+  "room_type" integer,
+  PRIMARY KEY ("room_id", "building_id")
+);
+
+CREATE TABLE "room_types" (
+  "type_id" integer,
+  "name" text
+);
+
+CREATE TABLE "building_functions" (
+  "building_id" integer,
+  "function_id" integer
+);
+
+CREATE TABLE "functions" (
+  "function_id" integer PRIMARY KEY,
+  "name" text UNIQUE,
+  "cost" integer,
+  "profession_id" integer
+);
+
+CREATE TABLE "task" (
+  "task_id" integer PRIMARY KEY,
+  "request_date" date,
+  "deadline" date,
+  "is_completed" boolean NOT NULL,
+  "manager_id" integer,
+  "room_id" integer,
+  "function_id" integer
+);
+
+CREATE TABLE "task_workers" (
+  "task_id" integer PRIMARY KEY,
+  "person_id" integer,
+  "execution_time" time
+);
+
+CREATE INDEX ON "task_workers" ("person_id", "execution_time");
+
+ALTER TABLE "workers" ADD FOREIGN KEY ("profession_id") REFERENCES "professions" ("profession_id");
+
+ALTER TABLE "buildings" ADD FOREIGN KEY ("building_type") REFERENCES "building_types" ("id");
+
+ALTER TABLE "building_functions" ADD FOREIGN KEY ("building_id") REFERENCES "buildings" ("building_id");
+
+ALTER TABLE "building_functions" ADD FOREIGN KEY ("function_id") REFERENCES "functions" ("function_id");
+
+ALTER TABLE "functions" ADD FOREIGN KEY ("profession_id") REFERENCES "professions" ("profession_id");
+
+ALTER TABLE "task" ADD FOREIGN KEY ("function_id") REFERENCES "functions" ("function_id");
+
+ALTER TABLE "workers" ADD FOREIGN KEY ("person_id") REFERENCES "persons" ("person_id");
+
+ALTER TABLE "task" ADD FOREIGN KEY ("manager_id") REFERENCES "persons" ("person_id");
+
+ALTER TABLE "phone_numbers" ADD FOREIGN KEY ("person_id") REFERENCES "persons" ("person_id");
+
+ALTER TABLE "task_workers" ADD FOREIGN KEY ("task_id") REFERENCES "task" ("task_id");
+
+ALTER TABLE "task_workers" ADD FOREIGN KEY ("person_id") REFERENCES "persons" ("person_id");
+
+ALTER TABLE "task" ADD FOREIGN KEY ("room_id") REFERENCES "rooms" ("room_id");
+
+ALTER TABLE "rooms" ADD FOREIGN KEY ("building_id") REFERENCES "buildings" ("building_id");
+
+ALTER TABLE "rooms" ADD FOREIGN KEY ("room_type") REFERENCES "room_types" ("type_id");
